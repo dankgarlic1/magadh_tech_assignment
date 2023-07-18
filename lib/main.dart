@@ -7,7 +7,7 @@ import 'package:magadh_tech_assignment/user_listing_page.dart';
 void main() {
   runApp( MaterialApp(
     debugShowCheckedModeBanner: false,
-    initialRoute:'map_view_page',
+    initialRoute:'login_page',
     routes: {
       'login_page':(context) => login_page(),
       'otp_page':(context) => otp_page(),

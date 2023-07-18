@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:magadh_tech_assignment/otp_page.dart';
+
 class login_page extends StatefulWidget {
   const login_page({super.key});
 
@@ -10,67 +11,95 @@ class login_page extends StatefulWidget {
 }
 
 class _login_pageState extends State<login_page> {
-  TextEditingController country_code= TextEditingController();
+  TextEditingController country_code = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
+  String phoneNumber = '';
 
   Future<void> sendOTP() async {
-    final apiUrl = 'https://flutter.magadh.co/api/v1/users/login-request'; //Server OTP API endpoint
-    final phoneNumber =phoneNumberController.text;
-    print(phoneNumber);
+    var headers = {
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('POST', Uri.parse('https://flutter.magadh.co/api/v1/users/login-request'));
+    request.body = json.encode({
+      "phone": phoneNumber,
+    });
+    request.headers.addAll(headers);
 
-    try {
-      final response = await http.post(Uri.parse(apiUrl), body: {
-        'phone': phoneNumber,
-      });
+    http.StreamedResponse response = await request.send();
 
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        final otp = responseData['otp'] as String;
-        final message = responseData['message'] as String;
+    if (response.statusCode == 200) {
+      final response_data=await response.stream.bytesToString();
+      print(response_data);
+      final jsonResponse = jsonDecode(response_data);
+      final otp = jsonResponse['otp'] as int;
+      print(otp);
+      final otp_str='$otp';
 
-        print(message); // Print the server message
+      // Now you have the OTP value in the 'otp' variable, you can use it as needed
+      print('Generated OTP: $otp');
+     // Extract 'otp' value as an integer
 
-        // OTP sent successfully, navigate to otp_page
-        Navigator.pushNamed(context, 'otp_page', arguments: {
-          'phoneNumber': phoneNumber,
-          'otp': otp,
-        });
-      } else {
-        final message = jsonDecode(response.body)['message'] as String;
-        print('fail: $message');
-        // Handle API error
-        // Show a SnackBar or display an error message to the user
-      }
-    } catch (e) {
-      print('exception');
-      // Handle any exceptions that occur during the API request
+
+      Navigator.pushNamed(context,'otp_page',arguments: otp_str);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('OTP Generation Successfull'),
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Text('Generated OTP: $otp'),
+                SizedBox(height: 10),
+                Text('OTP: '),
+                Text('$otp'),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close the dialog
+                },
+                child: Text('Okay'),
+              ),
+            ],
+          );
+        },
+      );
+
+
     }
+    else {
+      print(response.reasonPhrase);
+    }
+
   }
+
   @override
   void initState() {
     // TODO: implement initState
-    country_code.text='+91';
+    country_code.text = '+91';
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        margin: EdgeInsets.only(left: 25,right: 25),
+        margin: EdgeInsets.only(left: 25, right: 25),
         alignment: Alignment.center,
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                  'Assets/login.png',
+                'Assets/login.png',
                 height: 190,
                 width: 190,
               ),
               SizedBox(height: 10,),
-
               Text(
-                  'Account Login',
+                'Account Login',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize:  22,
@@ -78,14 +107,13 @@ class _login_pageState extends State<login_page> {
               ),
               SizedBox(height: 10,),
               Text(
-                  'Lets register your phone first before getting started !',
-              style: TextStyle(
-                fontSize: 16,
-              ),
+                'Lets register your phone first before getting started !',
+                style: TextStyle(
+                  fontSize: 16,
+                ),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 20,),
-
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
@@ -122,22 +150,22 @@ class _login_pageState extends State<login_page> {
                           border: InputBorder.none,
                           hintText: 'Phone Number',
                         ),
-
+                        onChanged: (value) {
+                          // Remove any non-digit characters from the entered text
+                          phoneNumber = value.replaceAll(RegExp(r'[^\d]'), '');
+                        },
                       ),
                     ),
                   ],
                 ),
               ),
-
               SizedBox(height: 20,),
               SizedBox(
                 height: 50,
                 width: double.infinity,
                 child: ElevatedButton(
-                    onPressed: (){
-                      sendOTP();
-                    },
-                    child: Text("Send One Time Password"),
+                  onPressed: sendOTP,
+                  child: Text("Send One Time Password"),
                   style: ElevatedButton.styleFrom(
                     primary: Colors.deepPurple,
                   ),

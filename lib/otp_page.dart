@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:magadh_tech_assignment/login_page.dart';
 import 'package:pinput/pinput.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -13,34 +14,59 @@ class otp_page extends StatefulWidget {
 class _otp_pageState extends State<otp_page> {
   TextEditingController otpController = TextEditingController();
   String phoneNumber = '';
-  String otp = '';
+  String receivedOtp = ''; // Store the OTP received from the login page
+  String enteredOtp = ''; // Store the OTP entered by the user
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    // Retrieve arguments passed from the login_page
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args = ModalRoute.of(context)?.settings.arguments as String?;
     if (args != null) {
-      phoneNumber = args['phoneNumber'] as String;
-      otp = args['otp'] as String; // Get the OTP value
+      receivedOtp = args; // Assign the argument to receivedOTP variable
     }
   }
+
+
   Future<void> verifyOTP() async {
     final apiUrl = 'https://flutter.magadh.co/api/v1/users/verify-token';
+    print(receivedOtp);
+    print(enteredOtp);
 
-    final enteredOTP = otpController.text; // Get the OTP entered by the user
-
-    if (enteredOTP == otp) {
-      // OTP verification successful, perform the desired action
-      // For example, you can navigate to another screen or show a success message
-      print('OTP verification successful');
+    if (enteredOtp == receivedOtp) {
+      // OTP verification successful, show an AlertDialog with the OTP
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('OTP Verification Successful'),
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Your OTP: $enteredOtp'),
+                // Add any other content you want to display in the dialog
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // Close the dialog when the user taps the button
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
     } else {
       // OTP verification failed
       // Show a SnackBar or display an error message to the user
       print('OTP verification failed');
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final defaultPinTheme = PinTheme(
@@ -106,19 +132,25 @@ class _otp_pageState extends State<otp_page> {
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 20,),
-          Pinput(
-            length: 6,
+              Pinput(
+                length: 6,
+                pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
+                showCursor: true,
+                // onSubmitted: (otp) {
+                //   setState(() {
+                //     enteredOtp = otp; // Update the enteredOtp variable
+                //     print('Entered OTP: $enteredOtp');
+                //   });
+                // },
+              ),
 
-
-            pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
-            showCursor: true,
-          ),
               SizedBox(height: 20,),
               SizedBox(
                 height: 50,
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: (){
+                    enteredOtp=otpController.text;
                     verifyOTP();
                   },
                   child: Text("Verify OTP"),
