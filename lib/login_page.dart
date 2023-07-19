@@ -40,7 +40,16 @@ class _login_pageState extends State<login_page> {
      // Extract 'otp' value as an integer
 
 
-      Navigator.pushNamed(context,'otp_page',arguments: otp_str);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => otp_page(
+            phoneNumber: phoneNumber, // Pass phoneNumber to otp_page
+            correct_otp: otp_str, // Pass otp_str to otp_page
+            token: '',
+          ),
+        ),
+      );
       showDialog(
         context: context,
         builder: (BuildContext context) {

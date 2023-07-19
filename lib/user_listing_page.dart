@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:magadh_tech_assignment/otp_page.dart';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class UserListingPage extends StatefulWidget {
@@ -11,11 +13,17 @@ class UserListingPage extends StatefulWidget {
 class _UserListingPageState extends State<UserListingPage> {
   List<Map<String, dynamic>> users = [];
 
-  Future<void> fetchUsers() async {
+  Future<void> fetchUsers(String token) async {
     final apiUrl = 'https://flutter.magadh.co/api/v1/users';
+    print("nigg");
+    print(token);
 
     try {
-      final response = await http.get(Uri.parse(apiUrl));
+      final headers = {
+        'Authorization': 'Bearer $token',
+      };
+
+      final response = await http.get(Uri.parse(apiUrl), headers: headers);
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
@@ -33,8 +41,13 @@ class _UserListingPageState extends State<UserListingPage> {
   @override
   void initState() {
     super.initState();
-    fetchUsers();
+    // You need to pass the token obtained after token verification to fetchUsers
+    // For example, if you have stored the token in a variable called 'token'
+    // you can pass it as follows:
+    // final token = ... // Get the token from wherever it was stored
+    fetchUsers('');
   }
+
 
   @override
   Widget build(BuildContext context) {

@@ -10,7 +10,7 @@ void main() {
     initialRoute:'login_page',
     routes: {
       'login_page':(context) => login_page(),
-      'otp_page':(context) => otp_page(),
+      'otp_page':(context) => otp_page(correct_otp: '',phoneNumber: '',token: '',),
       'user_listing_page': (context) => UserListingPage(),
       'map_view_page': (context) => MapViewPage(users: [],),
     },

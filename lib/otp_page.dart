@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:magadh_tech_assignment/login_page.dart';
+import 'package:magadh_tech_assignment/user_listing_page.dart';
 import 'package:pinput/pinput.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class otp_page extends StatefulWidget {
-  const otp_page({super.key});
+  final String phoneNumber;
+  final String correct_otp;
+  final String token;
+
+  otp_page({required this.phoneNumber, required this.correct_otp, required this.token});
 
   @override
   State<otp_page> createState() => _otp_pageState();
@@ -13,9 +18,9 @@ class otp_page extends StatefulWidget {
 
 class _otp_pageState extends State<otp_page> {
   TextEditingController otpController = TextEditingController();
-  String phoneNumber = '';
   String receivedOtp = ''; // Store the OTP received from the login page
   String enteredOtp = ''; // Store the OTP entered by the user
+  String token = ''; // Store the token after successful OTP verification
 
   @override
   void didChangeDependencies() {
@@ -26,14 +31,31 @@ class _otp_pageState extends State<otp_page> {
       receivedOtp = args; // Assign the argument to receivedOTP variable
     }
   }
-
-
   Future<void> verifyOTP() async {
-    final apiUrl = 'https://flutter.magadh.co/api/v1/users/verify-token';
-    print(receivedOtp);
-    print(enteredOtp);
+    final apiUrl = 'https://flutter.magadh.co/api/v1/users/login-verify';
 
-    if (enteredOtp == receivedOtp) {
+    final headers = {
+      'Content-Type': 'application/json',
+    };
+
+    final body = json.encode({
+      "phone": widget.phoneNumber, // Access phoneNumber from the widget
+      "otp": enteredOtp,
+    });
+
+    final response = await http.post(Uri.parse(apiUrl), headers: headers, body: body);
+
+    print(receivedOtp);
+    print(widget.phoneNumber); // Access phoneNumber from the widget
+    print(enteredOtp);
+    print(widget.correct_otp);
+    print(token);
+
+    if (response.statusCode==200 && enteredOtp == widget.correct_otp) { // Use correct_otp from the widget
+      // The request was successful
+      final jsonResponse = json.decode(response.body);
+      token = jsonResponse['token']; // Store the token from the response
+      print(jsonResponse); // You can access data from the response using jsonResponse['key']
       // OTP verification successful, show an AlertDialog with the OTP
       showDialog(
         context: context,
@@ -44,7 +66,7 @@ class _otp_pageState extends State<otp_page> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Your OTP: $enteredOtp'),
+                Text('Congratulations!, you are ready to go!'),
                 // Add any other content you want to display in the dialog
               ],
             ),
@@ -52,9 +74,15 @@ class _otp_pageState extends State<otp_page> {
               TextButton(
                 onPressed: () {
                   // Close the dialog when the user taps the button
-                  Navigator.of(context).pop();
+                  verifyToken(token);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UserListingPage(),
+                    ),
+                  );
                 },
-                child: Text('OK'),
+                child: Text('Okay'),
               ),
             ],
           );
@@ -64,8 +92,30 @@ class _otp_pageState extends State<otp_page> {
       // OTP verification failed
       // Show a SnackBar or display an error message to the user
       print('OTP verification failed');
+      print('API request failed: ${response.reasonPhrase}');
     }
   }
+
+  Future<void> verifyToken(String token) async {
+    final apiUrl = 'https://flutter.magadh.co/api/v1/users/verify-token';
+
+    final headers = {
+      'Authorization': 'Bearer $token',
+    };
+
+    final response = await http.get(Uri.parse(apiUrl), headers: headers);
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      print(jsonResponse['message']); // Should print "Token verified"
+      print(jsonResponse['user']); // Should print user details
+    } else {
+      print('Token verification failed');
+      print('API request failed: ${response.reasonPhrase}');
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -136,13 +186,13 @@ class _otp_pageState extends State<otp_page> {
                 length: 6,
                 pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
                 showCursor: true,
-                // onSubmitted: (otp) {
-                //   setState(() {
-                //     enteredOtp = otp; // Update the enteredOtp variable
-                //     print('Entered OTP: $enteredOtp');
-                //   });
-                // },
+                onCompleted: (otp) {
+                  setState(() {
+                    enteredOtp = otp;
+                  });
+                },
               ),
+
 
               SizedBox(height: 20,),
               SizedBox(
@@ -150,7 +200,10 @@ class _otp_pageState extends State<otp_page> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: (){
-                    enteredOtp=otpController.text;
+                    // enteredOtp = enteredOtp.trim(); // Trim any leading/trailing whitespace from the entered OTP
+                    // enteredOtp=otpController.text;
+                    print('niffa');
+                    print(enteredOtp);
                     verifyOTP();
                   },
                   child: Text("Verify OTP"),
