@@ -91,8 +91,30 @@ class _otp_pageState extends State<otp_page> {
         },
       );
     } else {
-      // OTP verification failed
-      // Show a SnackBar or display an error message to the user
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('OTP Verification Unsuccessful'),
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('You entered wrong OTP \n kindly try again or change your phone number'),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // Close the dialog when the user taps the button
+                  Navigator.pop(context);
+                },
+                child: Text('Retry'),
+              ),
+            ],
+          );
+        },
+      );
       print('OTP verification failed');
       print('API request failed: ${response.reasonPhrase}');
     }

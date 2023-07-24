@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "635980406115",
+    "project_id": "magadh-tech-assignment-ccc73",
+    "storage_bucket": "magadh-tech-assignment-ccc73.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:635980406115:android:1fe4f86b5f6e9776104756",
+        "android_client_info": {
+          "package_name": "com.example.magadh_tech_assignment"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "635980406115-8t2lv1jhdiv92or1qkaed9pnmqqc2hdm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7bE14laH_g7AvwMw1wwwCO_iI3AW-Eao"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "635980406115-8t2lv1jhdiv92or1qkaed9pnmqqc2hdm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

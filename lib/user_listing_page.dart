@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:magadh_tech_assignment/otp_page.dart';
 import 'package:magadh_tech_assignment/create_user_page.dart';
+import 'package:magadh_tech_assignment/user_detaill_page.dart';
+import 'package:magadh_tech_assignment/map_view_page.dart';
 
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class UserListingPage extends StatefulWidget {
-  final String token; // Add the 'token' parameter to the constructor
+  final String token; // Adding the 'token' parameter to the constructor
 
   UserListingPage({required this.token}); // Constructor that receives the token
 
@@ -25,7 +25,7 @@ class _UserListingPageState extends State<UserListingPage> {
 
     try {
       final headers = {
-        'Authorization': 'Bearer ${widget.token}', // Use the widget's token
+        'Authorization': 'Bearer ${widget.token}', // Using the widget's token
       };
 
       final response = await http.get(Uri.parse(apiUrl), headers: headers);
@@ -61,6 +61,15 @@ class _UserListingPageState extends State<UserListingPage> {
     });
   }
 
+  void navigateToUserDetailPage(Map<String, dynamic> user) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => user_detail_page(userData: user),
+      ),
+    );
+  }
+
 
   @override
   void initState() {
@@ -77,7 +86,7 @@ class _UserListingPageState extends State<UserListingPage> {
       200: Color(0xFFA2A6F6),
       300: Color(0xFF7D82F3),
       400: Color(0xFF6268F1),
-      500: Color(0xFF4E4FEB), // Primary color
+      500: Color(0xFF4E4FEB),
       600: Color(0xFF4649E9),
       700: Color(0xFF3B3EE7),
       800: Color(0xFF3136E4),
@@ -86,7 +95,7 @@ class _UserListingPageState extends State<UserListingPage> {
 
     return MaterialApp(
       theme: ThemeData(
-        primarySwatch: customPrimaryColor, // Use the custom primary color
+        primarySwatch: customPrimaryColor,
       ),
       home: Scaffold(
         appBar: AppBar(
@@ -112,6 +121,19 @@ class _UserListingPageState extends State<UserListingPage> {
               child: Icon(Icons.add),
               elevation: 0,
             ),
+            IconButton(
+              onPressed: () {
+                print(users);
+                // Navigate to the MapViewPage with all users' data
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MapViewPage(users: users),
+                  ),
+                );
+              },
+              icon: Icon(Icons.map),
+            ),
           ],
         ),
         body: users.isEmpty
@@ -123,8 +145,8 @@ class _UserListingPageState extends State<UserListingPage> {
             return Card(
               color: Colors.white, // Customize card color
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0), // Add border radius
-                side: BorderSide(color: customPrimaryColor.shade400, width: 1.0), // Add border outline
+                borderRadius: BorderRadius.circular(10.0),
+                side: BorderSide(color: customPrimaryColor.shade400, width: 1.0),
               ),
               child: ListTile(
                 leading: CircleAvatar(
@@ -133,7 +155,7 @@ class _UserListingPageState extends State<UserListingPage> {
                 title: Text(
                   user['name'],
                   style: TextStyle(
-                    color: customPrimaryColor, // Customize text color
+                    color: customPrimaryColor,
                     fontWeight: FontWeight.bold,
                     fontSize: 18.0,
                   ),
@@ -141,12 +163,12 @@ class _UserListingPageState extends State<UserListingPage> {
                 subtitle: Text(
                   user['email'],
                   style: TextStyle(
-                    color: Colors.grey, // Customize text color
+                    color: Colors.grey,
                   ),
                 ),
                 trailing: Icon(Icons.arrow_forward),
                 onTap: () {
-                  // Handle user detail page navigation
+                  navigateToUserDetailPage(user);
                 },
               ),
             );

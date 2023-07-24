@@ -1,11 +1,20 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:magadh_tech_assignment/firebase_api/firebase_api.dart';
 import 'package:magadh_tech_assignment/login_page.dart';
 import 'package:magadh_tech_assignment/map_view_page.dart';
 import 'package:magadh_tech_assignment/otp_page.dart';
 import 'package:magadh_tech_assignment/user_listing_page.dart';
 import 'package:magadh_tech_assignment/create_user_page.dart';
 
-void main() {
+
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+
+void main()  {
+  // WidgetsFlutterBinding.ensureInitialized();
+  // await Firebase.initializeApp();
+  // await FirebaseApi().initNotifications();
   runApp( MaterialApp(
     debugShowCheckedModeBanner: false,
     initialRoute:'login_page',
@@ -19,7 +28,8 @@ void main() {
         onUserAdded: (newUser) {
         // Handle the addition of new users here in the UserListingPage
         Navigator.pop(context); // Pop the CreateUserPage from the stack
-      }, ),
+      },
+      ),
     },
   ),
   );

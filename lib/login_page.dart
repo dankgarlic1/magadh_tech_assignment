@@ -35,7 +35,7 @@ class _login_pageState extends State<login_page> {
       print(otp);
       final otp_str='$otp';
 
-      // Now you have the OTP value in the 'otp' variable, you can use it as needed
+      // Now OTP value in the 'otp' variable
       print('Generated OTP: $otp');
      // Extract 'otp' value as an integer
 
@@ -68,7 +68,7 @@ class _login_pageState extends State<login_page> {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context); // Close the dialog
+                  Navigator.pop(context);
                 },
                 child: Text('Okay'),
               ),
@@ -76,11 +76,25 @@ class _login_pageState extends State<login_page> {
           );
         },
       );
-
-
     }
     else {
       print(response.reasonPhrase);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Wrong Phone Number'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Retry'),
+              ),
+            ],
+          );
+        },
+      );
     }
 
   }
@@ -160,7 +174,7 @@ class _login_pageState extends State<login_page> {
                           hintText: 'Phone Number',
                         ),
                         onChanged: (value) {
-                          // Remove any non-digit characters from the entered text
+                          // Removing any non-digit characters from text
                           phoneNumber = value.replaceAll(RegExp(r'[^\d]'), '');
                         },
                       ),
